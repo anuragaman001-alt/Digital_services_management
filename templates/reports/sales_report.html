@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% block title %}Sales Report{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2>Sales Report</h2>
+        <p>Subscription analytics and revenue overview</p>
+    </div>
+    <a href="{% url 'export_sales_csv' %}?type={{ plan_type }}&status={{ status_filter }}" class="btn btn-success btn-sm">Export CSV</a>
+</div>
+
+<div class="stat-grid">
+    <div class="stat-card">
+        <div class="stat-label">Total Revenue</div>
+        <div class="stat-value" style="color:#2e7d32;">Rs.{{ total_revenue }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Total Subscriptions</div>
+        <div class="stat-value">{{ total_subs }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Active Now</div>
+        <div class="stat-value" style="color:#1565c0;">{{ active_subs }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Inactive</div>
+        <div class="stat-value" style="color:#757575;">{{ total_subs|add:"-"|add:active_subs }}</div>
+    </div>
+</div>
+
+<div class="card" style="max-width:420px;margin-bottom:16px;">
+    <div class="card-header">By Plan Type</div>
+    <div class="card-body">
+        {% for item in plan_breakdown %}
+        <div style="display:flex;align-items:center;margin-bottom:10px;gap:8px;">
+            <span class="badge badge-{{ item.plan__plan_type }}" style="min-width:60px;text-align:center;">
+                {% if item.plan__plan_type == 'wifi' %}WiFi
+                {% elif item.plan__plan_type == 'sim' %}SIM
+                {% else %}OTT{% endif %}
+            </span>
+            <div class="progress-bar-wrap">
+                {% if total_subs %}
+                <div class="progress-bar-fill" style="width:{% widthratio item.count total_subs 100 %}%;background:{% if item.plan__plan_type == 'wifi' %}#1565c0{% elif item.plan__plan_type == 'sim' %}#2e7d32{% else %}#880e4f{% endif %};"></div>
+                {% endif %}
+            </div>
+            <strong style="min-width:24px;font-size:13px;">{{ item.count }}</strong>
+        </div>
+        {% empty %}
+        <p class="text-muted">No data available.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="filter-bar">
+    <form method="get" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
+        <div class="filter-group">
+            <label>Plan Type</label>
+            <select name="type">
+                <option value="">All</option>
+                <option value="wifi" {% if plan_type == 'wifi' %}selected{% endif %}>WiFi</option>
+                <option value="sim"  {% if plan_type == 'sim'  %}selected{% endif %}>SIM</option>
+                <option value="ott"  {% if plan_type == 'ott'  %}selected{% endif %}>OTT</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>Status</label>
+            <select name="status">
+                <option value="">All</option>
+                <option value="active"   {% if status_filter == 'active'   %}selected{% endif %}>Active</option>
+                <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm">Apply</button>
+        <a href="{% url 'sales_report' %}" class="btn btn-sm">Reset</a>
+    </form>
+</div>
+
+<div class="card">
+    <div class="card-header">All Records</div>
+    <div class="card-body" style="padding:0;">
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Plan</th>
+                        <th>Type</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Activated</th>
+                        <th>Expires</th>
+                        <th>Days Left</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sub in subscriptions %}
+                    <tr>
+                        <td>
+                            <strong>{{ sub.user.get_full_name|default:sub.user.username }}</strong><br>
+                            <span class="text-muted">{{ sub.user.email }}</span>
+                        </td>
+                        <td>{{ sub.plan.name }}</td>
+                        <td><span class="badge badge-{{ sub.plan.plan_type }}">{{ sub.plan.get_plan_type_display }}</span></td>
+                        <td><strong>Rs.{{ sub.plan.price }}</strong></td>
+                        <td>
+                            {% if sub.status == 'active' %}
+                                <span class="badge badge-active">Active</span>
+                            {% else %}
+                                <span class="badge badge-inactive">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-muted">{{ sub.activated_at|date:"d M Y" }}</td>
+                        <td class="text-muted">{{ sub.expires_at|date:"d M Y"|default:"—" }}</td>
+                        <td>
+                            {% if sub.status == 'active' %}
+                                <span class="{% if sub.days_remaining < 5 %}text-danger{% else %}text-muted{% endif %}">{{ sub.days_remaining }}d</span>
+                            {% else %}—{% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="8" style="text-align:center;padding:20px;color:#888;">No records found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

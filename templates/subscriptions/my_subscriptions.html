@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}My Subscriptions{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2>My Subscriptions</h2>
+        <p>All your service plans</p>
+    </div>
+    <a href="{% url 'plan_list' %}" class="btn btn-primary btn-sm">+ Add Plan</a>
+</div>
+
+<div class="plan-grid">
+    {% for sub in subscriptions %}
+    <div class="card" style="margin:0;">
+        <div class="card-body">
+            <div class="flex-gap" style="margin-bottom:10px;">
+                <span class="badge badge-{{ sub.plan.plan_type }}">{{ sub.plan.get_plan_type_display }}</span>
+                {% if sub.status == 'active' %}
+                    <span class="badge badge-active">Active</span>
+                {% else %}
+                    <span class="badge badge-inactive">Inactive</span>
+                {% endif %}
+            </div>
+            <strong style="font-size:15px;">{{ sub.plan.name }}</strong><br>
+            <span style="color:#1565c0;font-weight:bold;">Rs.{{ sub.plan.price }}</span><br>
+            <div style="margin-top:8px;">
+                <div class="text-muted">Activated: {{ sub.activated_at|date:"d M Y" }}</div>
+                {% if sub.expires_at %}
+                <div class="text-muted">Expires: {{ sub.expires_at|date:"d M Y" }}</div>
+                {% endif %}
+                {% if sub.status == 'active' %}
+                <div class="{% if sub.days_remaining < 5 %}text-danger{% else %}text-muted{% endif %}">
+                    {{ sub.days_remaining }} days remaining
+                </div>
+                {% endif %}
+            </div>
+            <div class="flex-gap" style="margin-top:12px;">
+                {% for invoice in sub.invoices.all %}
+                <a href="{% url 'download_invoice' invoice.pk %}" class="btn btn-sm">Invoice</a>
+                {% endfor %}
+                {% if sub.status == 'active' %}
+                <a href="{% url 'upgrade_downgrade' sub.pk %}" class="btn btn-sm btn-outline-primary">Change</a>
+                <a href="{% url 'deactivate_subscription' sub.pk %}" class="btn btn-sm btn-outline-danger">Deactivate</a>
+                {% else %}
+                <a href="{% url 'reactivate_subscription' sub.pk %}" class="btn btn-sm btn-outline-success">Reactivate</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div style="text-align:center;color:#888;padding:40px;grid-column:1/-1;">
+        No subscriptions yet. <a href="{% url 'plan_list' %}">Browse plans</a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

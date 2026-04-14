@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Digital Services Management{% endblock %}</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+        a { color: #2255aa; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        /* ---- Sidebar ---- */
+        #sidebar {
+            position: fixed;
+            top: 0; left: 0;
+            width: 220px;
+            min-height: 100vh;
+            background-color: #1a237e;
+            color: #ccc;
+        }
+        #sidebar .brand {
+            display: block;
+            background-color: #0d1757;
+            padding: 15px 20px;
+            color: white;
+            font-weight: bold;
+            font-size: 15px;
+            text-decoration: none;
+        }
+        #sidebar .section-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #7986cb;
+            padding: 12px 20px 4px;
+        }
+        #sidebar a.nav-link {
+            display: block;
+            padding: 10px 20px;
+            color: #c5cae9;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        #sidebar a.nav-link:hover, #sidebar a.nav-link.active {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+        }
+        #sidebar a.nav-link.logout { color: #ef9a9a; }
+
+        /* ---- Main Content ---- */
+        #main-content {
+            margin-left: 220px;
+            min-height: 100vh;
+        }
+        .top-bar {
+            background: white;
+            border-bottom: 1px solid #ddd;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .top-bar .welcome { font-size: 14px; color: #555; }
+        .top-bar .welcome strong { color: #333; }
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            color: white;
+        }
+        .badge-admin { background-color: #c62828; }
+        .badge-user { background-color: #1565c0; }
+        .badge-active { background-color: #2e7d32; }
+        .badge-inactive { background-color: #757575; }
+        .badge-wifi { background-color: #1565c0; color: white; }
+        .badge-sim { background-color: #2e7d32; color: white; }
+        .badge-ott { background-color: #880e4f; color: white; }
+
+        .page-content { padding: 20px; }
+
+        /* ---- Alerts ---- */
+        .alert {
+            padding: 12px 16px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            border: 1px solid transparent;
+            font-size: 14px;
+        }
+        .alert-success { background: #e8f5e9; border-color: #a5d6a7; color: #1b5e20; }
+        .alert-error, .alert-danger { background: #ffebee; border-color: #ef9a9a; color: #b71c1c; }
+        .alert-info { background: #e3f2fd; border-color: #90caf9; color: #0d47a1; }
+        .alert-warning { background: #fff8e1; border-color: #ffe082; color: #e65100; }
+
+        /* ---- Buttons ---- */
+        .btn {
+            display: inline-block;
+            padding: 7px 16px;
+            border: 1px solid #999;
+            background: #e0e0e0;
+            color: #333;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 13px;
+            text-decoration: none;
+        }
+        .btn:hover { background: #d0d0d0; text-decoration: none; }
+        .btn-primary { background: #1565c0; color: white; border-color: #0d47a1; }
+        .btn-primary:hover { background: #0d47a1; }
+        .btn-success { background: #2e7d32; color: white; border-color: #1b5e20; }
+        .btn-success:hover { background: #1b5e20; }
+        .btn-danger { background: #c62828; color: white; border-color: #b71c1c; }
+        .btn-danger:hover { background: #b71c1c; }
+        .btn-warning { background: #f57f17; color: white; border-color: #e65100; }
+        .btn-warning:hover { background: #e65100; }
+        .btn-sm { padding: 4px 10px; font-size: 12px; }
+        .btn-outline { background: white; }
+        .btn-outline-danger { background: white; color: #c62828; border-color: #c62828; }
+        .btn-outline-primary { background: white; color: #1565c0; border-color: #1565c0; }
+        .btn-outline-success { background: white; color: #2e7d32; border-color: #2e7d32; }
+
+        /* ---- Cards ---- */
+        .card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 16px;
+        }
+        .card-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid #ddd;
+            font-weight: bold;
+            font-size: 14px;
+            background: #fafafa;
+        }
+        .card-body { padding: 16px; }
+
+        /* ---- Stat Cards ---- */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 14px 16px;
+        }
+        .stat-card .stat-label { font-size: 12px; color: #777; margin-bottom: 4px; }
+        .stat-card .stat-value { font-size: 24px; font-weight: bold; color: #333; }
+
+        /* ---- Tables ---- */
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        table th {
+            background: #f5f5f5;
+            border-bottom: 2px solid #ddd;
+            padding: 9px 12px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: bold;
+            color: #555;
+        }
+        table td {
+            padding: 9px 12px;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+        }
+        table tr:hover td { background: #fafafa; }
+        .table-container { overflow-x: auto; }
+
+        /* ---- Forms ---- */
+        .form-group { margin-bottom: 14px; }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 4px;
+            color: #444;
+        }
+        .form-input, input[type=text], input[type=email], input[type=password],
+        input[type=number], input[type=date], select, textarea {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #bbb;
+            border-radius: 3px;
+            font-size: 13px;
+            background: white;
+        }
+        .form-input:focus, input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #1565c0;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .form-row.three { grid-template-columns: 1fr 1fr 1fr; }
+        .error-text { color: #c62828; font-size: 12px; margin-top: 3px; }
+        .help-text { color: #888; font-size: 11px; margin-top: 3px; }
+
+        /* ---- Page Header ---- */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .page-header h2 { font-size: 18px; margin: 0; }
+        .page-header p { font-size: 12px; color: #777; margin: 2px 0 0; }
+
+        /* ---- Filter bar ---- */
+        .filter-bar {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+        .filter-bar .filter-group { display: flex; flex-direction: column; gap: 3px; }
+        .filter-bar .filter-group label { font-size: 11px; font-weight: bold; color: #555; }
+        .filter-bar select, .filter-bar input { width: auto; min-width: 120px; padding: 5px 8px; font-size: 12px; }
+
+        /* ---- Public layout (login/register) ---- */
+        .public-wrapper {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a237e, #283593);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .auth-card {
+            background: white;
+            border-radius: 6px;
+            padding: 30px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        .auth-card h2 { text-align: center; margin-bottom: 4px; font-size: 20px; }
+        .auth-card .subtitle { text-align: center; color: #888; font-size: 13px; margin-bottom: 20px; }
+        .auth-card .links { display: flex; justify-content: space-between; font-size: 13px; margin-top: 14px; }
+
+        /* ---- Progress bar ---- */
+        .progress-bar-wrap { background: #e0e0e0; border-radius: 4px; height: 8px; flex: 1; margin: 0 10px; }
+        .progress-bar-fill { background: #1565c0; height: 8px; border-radius: 4px; }
+
+        /* ---- Plan cards ---- */
+        .plan-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        .plan-card {
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            padding: 18px;
+            text-align: center;
+            text-decoration: none;
+            color: #333;
+            display: block;
+        }
+        .plan-card:hover { border-color: #1565c0; text-decoration: none; }
+        .plan-card .plan-icon { font-size: 36px; margin-bottom: 8px; }
+        .plan-card h3 { font-size: 16px; margin-bottom: 5px; }
+        .plan-card p { font-size: 12px; color: #666; margin-bottom: 10px; }
+
+        /* ---- Misc ---- */
+        .text-muted { color: #888; font-size: 12px; }
+        .text-success { color: #2e7d32; }
+        .text-danger { color: #c62828; }
+        .mt-10 { margin-top: 10px; }
+        .mb-10 { margin-bottom: 10px; }
+        .flex-gap { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        hr { border: none; border-top: 1px solid #ddd; margin: 16px 0; }
+
+        /* ---- Mobile ---- */
+        #menu-btn { display: none; background: #1a237e; color: white; border: none; padding: 8px 14px; cursor: pointer; font-size: 18px; }
+        @media (max-width: 700px) {
+            #sidebar { display: none; }
+            #sidebar.open { display: block; position: fixed; z-index: 200; }
+            #main-content { margin-left: 0; }
+            #menu-btn { display: inline-block; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+{% if user.is_authenticated %}
+<nav id="sidebar">
+    <a href="{% url 'dashboard' %}" class="brand">&#128225; Digital Services</a>
+
+    <div class="section-label">Menu</div>
+    <a href="{% url 'dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">&#9778; Dashboard</a>
+
+    {% if user.is_admin %}
+    <div class="section-label">Admin</div>
+    <a href="{% url 'admin_user_list' %}" class="nav-link">&#128101; Users</a>
+    <a href="{% url 'admin_plan_list' %}" class="nav-link">&#128196; Plans</a>
+    <a href="{% url 'admin_subscription_list' %}" class="nav-link">&#128203; Subscriptions</a>
+    <a href="{% url 'sales_report' %}" class="nav-link">&#128202; Sales Report</a>
+    {% else %}
+    <div class="section-label">Services</div>
+    <a href="{% url 'plan_list' %}?type=wifi" class="nav-link">&#128225; WiFi Plans</a>
+    <a href="{% url 'plan_list' %}?type=sim" class="nav-link">&#128241; SIM Plans</a>
+    <a href="{% url 'plan_list' %}?type=ott" class="nav-link">&#127909; OTT Plans</a>
+    <div class="section-label">Account</div>
+    <a href="{% url 'my_subscriptions' %}" class="nav-link">&#128203; My Subscriptions</a>
+    {% endif %}
+
+    <div class="section-label">Account</div>
+    <a href="{% url 'user_profile' %}" class="nav-link">&#128100; Profile</a>
+    <a href="{% url 'logout' %}" class="nav-link logout">&#128682; Logout</a>
+</nav>
+
+<div id="main-content">
+    <div class="top-bar">
+        <button id="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">&#9776;</button>
+        <div class="welcome">
+            Welcome, <strong>{{ user.first_name|default:user.username }}</strong>
+            <span class="badge {% if user.is_admin %}badge-admin{% else %}badge-user{% endif %}">
+                {{ user.get_role_display }}
+            </span>
+        </div>
+    </div>
+
+    <div class="page-content">
+        {% for message in messages %}
+        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+
+        {% block content %}{% endblock %}
+    </div>
+</div>
+
+{% else %}
+<div class="public-wrapper">
+    <div style="width:100%;max-width:440px;">
+        {% for message in messages %}
+        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% block public_content %}{% endblock %}
+    </div>
+</div>
+{% endif %}
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block title %}All Subscriptions{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2>All Subscriptions</h2>
+        <p>{{ subscriptions.count }} records</p>
+    </div>
+</div>
+
+<div class="filter-bar">
+    <form method="get" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
+        <div class="filter-group">
+            <label>Plan Type</label>
+            <select name="type">
+                <option value="">All Types</option>
+                <option value="wifi" {% if plan_type == 'wifi' %}selected{% endif %}>WiFi</option>
+                <option value="sim" {% if plan_type == 'sim' %}selected{% endif %}>SIM</option>
+                <option value="ott" {% if plan_type == 'ott' %}selected{% endif %}>OTT</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>Status</label>
+            <select name="status">
+                <option value="">All Status</option>
+                <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+                <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+        <a href="{% url 'admin_subscription_list' %}" class="btn btn-sm">Reset</a>
+    </form>
+</div>
+
+<div class="card">
+    <div class="card-body" style="padding:0;">
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Plan</th>
+                        <th>Type</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Activated</th>
+                        <th>Expires</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sub in subscriptions %}
+                    <tr>
+                        <td>
+                            <strong>{{ sub.user.get_full_name|default:sub.user.username }}</strong><br>
+                            <span class="text-muted">{{ sub.user.email }}</span>
+                        </td>
+                        <td>{{ sub.plan.name }}</td>
+                        <td><span class="badge badge-{{ sub.plan.plan_type }}">{{ sub.plan.get_plan_type_display }}</span></td>
+                        <td>Rs.{{ sub.plan.price }}</td>
+                        <td>
+                            {% if sub.status == 'active' %}
+                                <span class="badge badge-active">Active</span>
+                            {% else %}
+                                <span class="badge badge-inactive">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-muted">{{ sub.activated_at|date:"d M Y" }}</td>
+                        <td class="text-muted">
+                            {{ sub.expires_at|date:"d M Y"|default:"—" }}
+                            {% if sub.status == 'active' and sub.days_remaining < 5 %}
+                                <span class="badge badge-admin">{{ sub.days_remaining }}d left</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'admin_toggle_subscription' sub.pk %}" class="btn btn-sm btn-warning">
+                                {% if sub.status == 'active' %}Deactivate{% else %}Activate{% endif %}
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="8" style="text-align:center;padding:20px;color:#888;">No subscriptions found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

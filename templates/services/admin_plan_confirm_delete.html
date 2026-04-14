@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Delete Plan{% endblock %}
+{% block content %}
+<div class="card" style="max-width:450px;">
+    <div class="card-header">Confirm Delete</div>
+    <div class="card-body">
+        <p>Are you sure you want to delete plan <strong>{{ plan.name }}</strong>?</p>
+        <p class="text-muted">This will also remove all subscriptions linked to this plan.</p>
+        <form method="post" style="margin-top:14px;">
+            {% csrf_token %}
+            <div class="flex-gap">
+                <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                <a href="{% url 'admin_plan_list' %}" class="btn">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

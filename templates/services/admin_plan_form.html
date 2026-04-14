@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}{{ action }} Plan{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2>{{ action }} Plan</h2>
+        {% if plan %}<p>Editing: {{ plan.name }}</p>{% endif %}
+    </div>
+    <a href="{% url 'admin_plan_list' %}" class="btn btn-sm">&larr; Back</a>
+</div>
+
+<div class="card" style="max-width:700px;">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+
+            <p style="font-size:12px;font-weight:bold;color:#777;text-transform:uppercase;margin-bottom:10px;">Core Details</p>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Plan Type</label>
+                    {{ form.plan_type }}
+                </div>
+                <div class="form-group">
+                    <label>Plan Name</label>
+                    {{ form.name }}
+                    {% if form.name.errors %}<div class="error-text">{{ form.name.errors.0 }}</div>{% endif %}
+                </div>
+                <div class="form-group">
+                    <label>Price (Rs.)</label>
+                    {{ form.price }}
+                    {% if form.price.errors %}<div class="error-text">{{ form.price.errors.0 }}</div>{% endif %}
+                </div>
+                <div class="form-group">
+                    <label>Validity</label>
+                    {{ form.validity_days }}
+                </div>
+                <div class="form-group col-full">
+                    <label>Description</label>
+                    {{ form.description }}
+                </div>
+                <div class="form-group" style="display:flex;align-items:center;gap:8px;">
+                    {{ form.is_active }}
+                    <label style="margin:0;">Active</label>
+                </div>
+            </div>
+
+            <div class="flex-gap" style="margin-top:16px;">
+                <button type="submit" class="btn btn-primary">{{ action }} Plan</button>
+                <a href="{% url 'admin_plan_list' %}" class="btn">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+<style>.col-full { grid-column: 1 / -1; }</style>
+{% endblock %}

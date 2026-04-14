@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}{{ plan.name }}{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2>{{ plan.name }}</h2>
+        <p><span class="badge badge-{{ plan.plan_type }}">{{ plan.get_plan_type_display }}</span></p>
+    </div>
+    <a href="{% url 'plan_list' %}?type={{ plan.plan_type }}" class="btn btn-sm">&larr; Back</a>
+</div>
+
+<div class="card" style="max-width:500px;">
+    <div class="card-body">
+        <table>
+            <tr><td style="padding:6px 12px 6px 0;color:#777;">Price</td><td><strong style="font-size:18px;color:#1565c0;">Rs.{{ plan.price }}</strong></td></tr>
+            <tr><td style="padding:6px 12px 6px 0;color:#777;">Validity</td><td>{{ plan.validity_days }} days</td></tr>
+            {% if plan.description %}
+            <tr><td style="padding:6px 12px 6px 0;color:#777;">Description</td><td>{{ plan.description }}</td></tr>
+            {% endif %}
+            {% if plan.plan_type == 'wifi' %}
+                {% if plan.speed_mbps %}<tr><td style="padding:6px 12px 6px 0;color:#777;">Speed</td><td>{{ plan.speed_mbps }} Mbps</td></tr>{% endif %}
+                {% if plan.data_limit_gb %}<tr><td style="padding:6px 12px 6px 0;color:#777;">Data Limit</td><td>{{ plan.data_limit_gb }} GB</td></tr>
+                {% else %}<tr><td style="padding:6px 12px 6px 0;color:#777;">Data</td><td>Unlimited</td></tr>{% endif %}
+            {% elif plan.plan_type == 'sim' %}
+                {% if plan.mobile_data_gb %}<tr><td style="padding:6px 12px 6px 0;color:#777;">Mobile Data</td><td>{{ plan.mobile_data_gb }} GB</td></tr>{% endif %}
+                {% if plan.calls %}<tr><td style="padding:6px 12px 6px 0;color:#777;">Calls</td><td>{{ plan.calls }}</td></tr>{% endif %}
+                {% if plan.sms %}<tr><td style="padding:6px 12px 6px 0;color:#777;">SMS</td><td>{{ plan.sms }}</td></tr>{% endif %}
+            {% elif plan.plan_type == 'ott' %}
+                {% if plan.streams %}<tr><td style="padding:6px 12px 6px 0;color:#777;">Streams</td><td>{{ plan.streams }} simultaneous</td></tr>{% endif %}
+                {% if plan.resolution %}<tr><td style="padding:6px 12px 6px 0;color:#777;">Resolution</td><td>{{ plan.resolution }}</td></tr>{% endif %}
+                {% if plan.platforms %}<tr><td style="padding:6px 12px 6px 0;color:#777;">Platforms</td><td>{{ plan.platforms }}</td></tr>{% endif %}
+            {% endif %}
+        </table>
+        <div class="flex-gap" style="margin-top:16px;">
+            {% if user_sub %}
+                <span class="badge badge-active">Already Subscribed</span>
+                <a href="{% url 'upgrade_downgrade' user_sub.pk %}" class="btn btn-sm btn-outline-primary">Change Plan</a>
+            {% else %}
+                <a href="{% url 'subscribe' plan.pk %}" class="btn btn-primary">Subscribe Now</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

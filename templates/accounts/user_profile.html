@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}My Profile{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2>My Profile</h2>
+        <p>Update your personal information</p>
+    </div>
+</div>
+
+<div class="card" style="max-width:600px;">
+    <div class="card-header">Profile Details</div>
+    <div class="card-body">
+        <div style="text-align:center;margin-bottom:16px;">
+            <div style="width:64px;height:64px;border-radius:50%;background:#1565c0;color:white;font-size:24px;font-weight:bold;display:inline-flex;align-items:center;justify-content:center;">
+                {{ user.first_name.0|upper|default:user.username.0|upper }}
+            </div>
+            <div style="margin-top:8px;font-weight:bold;">{{ user.get_full_name|default:user.username }}</div>
+            <div class="text-muted">{{ user.email }}</div>
+            <span class="badge {% if user.is_admin %}badge-admin{% else %}badge-user{% endif %}" style="margin-top:4px;">{{ user.get_role_display }}</span>
+        </div>
+        <hr>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-row">
+                {% for field in form %}
+                <div class="form-group {% if field.name == 'address' %}col-full{% endif %}">
+                    <label>{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}<div class="error-text">{{ field.errors.0 }}</div>{% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            <button type="submit" class="btn btn-primary mt-10">Save Changes</button>
+        </form>
+    </div>
+</div>
+<style>.col-full { grid-column: 1 / -1; }</style>
+{% endblock %}

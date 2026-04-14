@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}Manage Plans{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2>Manage Plans</h2>
+        <p>{{ plans.count }} plans</p>
+    </div>
+    <a href="{% url 'admin_plan_create' %}" class="btn btn-primary btn-sm">+ Add Plan</a>
+</div>
+
+<div class="flex-gap" style="margin-bottom:12px;">
+    <a href="?type=all" class="btn btn-sm {% if plan_type == 'all' %}btn-primary{% endif %}">All</a>
+    <a href="?type=wifi" class="btn btn-sm {% if plan_type == 'wifi' %}btn-primary{% endif %}">WiFi</a>
+    <a href="?type=sim"  class="btn btn-sm {% if plan_type == 'sim'  %}btn-primary{% endif %}">SIM</a>
+    <a href="?type=ott"  class="btn btn-sm {% if plan_type == 'ott'  %}btn-primary{% endif %}">OTT</a>
+</div>
+
+<div class="card">
+    <div class="card-body" style="padding:0;">
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Plan Name</th>
+                        <th>Type</th>
+                        <th>Price</th>
+                        <th>Validity</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for plan in plans %}
+                    <tr>
+                        <td>
+                            <strong>{{ plan.name }}</strong><br>
+                            <span class="text-muted">{{ plan.description|truncatechars:50 }}</span>
+                        </td>
+                        <td><span class="badge badge-{{ plan.plan_type }}">{{ plan.get_plan_type_display }}</span></td>
+                        <td><strong>Rs.{{ plan.price }}</strong></td>
+                        <td class="text-muted">{{ plan.validity_days }} days</td>
+                        <td>
+                            {% if plan.is_active %}
+                                <span class="badge badge-active">Active</span>
+                            {% else %}
+                                <span class="badge badge-inactive">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="flex-gap">
+                                <a href="{% url 'admin_plan_update' plan.pk %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                <a href="{% url 'admin_plan_toggle' plan.pk %}" class="btn btn-sm btn-warning">{% if plan.is_active %}Deactivate{% else %}Activate{% endif %}</a>
+                                <a href="{% url 'admin_plan_delete' plan.pk %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" style="text-align:center;padding:20px;color:#888;">No plans found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

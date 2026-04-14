@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Login - Digital Services{% endblock %}
+{% block public_content %}
+<div class="auth-card">
+    <h2>Digital Services</h2>
+    <p class="subtitle">Sign in to your account</p>
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="form-group">
+            <label>{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}<div class="error-text">{{ field.errors.0 }}</div>{% endif %}
+        </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary" style="width:100%;padding:10px;">Login</button>
+    </form>
+    <hr>
+    <div class="links">
+        <a href="{% url 'password_reset_request' %}">Forgot password?</a>
+        <a href="{% url 'register' %}">Create account</a>
+    </div>
+</div>
+{% endblock %}

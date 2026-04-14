@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Deactivate Subscription{% endblock %}
+{% block content %}
+<div class="card" style="max-width:450px;">
+    <div class="card-header">Confirm Deactivation</div>
+    <div class="card-body">
+        <p>Are you sure you want to deactivate your <strong>{{ sub.plan.name }}</strong> subscription?</p>
+        <form method="post" style="margin-top:14px;">
+            {% csrf_token %}
+            <div class="flex-gap">
+                <button type="submit" class="btn btn-danger">Yes, Deactivate</button>
+                <a href="{% url 'my_subscriptions' %}" class="btn">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

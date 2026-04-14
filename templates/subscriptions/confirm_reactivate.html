@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Reactivate Subscription{% endblock %}
+{% block content %}
+<div class="card" style="max-width:450px;">
+    <div class="card-header">Confirm Reactivation</div>
+    <div class="card-body">
+        <p>Reactivate your <strong>{{ sub.plan.name }}</strong> subscription?</p>
+        <form method="post" style="margin-top:14px;">
+            {% csrf_token %}
+            <div class="flex-gap">
+                <button type="submit" class="btn btn-success">Yes, Reactivate</button>
+                <a href="{% url 'my_subscriptions' %}" class="btn">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

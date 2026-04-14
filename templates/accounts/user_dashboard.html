@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2>Welcome, {{ user.first_name|default:user.username }}!</h2>
+        <p>Browse and manage your service plans</p>
+    </div>
+</div>
+
+<div class="plan-grid">
+    <a href="{% url 'plan_list' %}?type=wifi" class="plan-card">
+        <div class="plan-icon">&#128225;</div>
+        <h3 style="color:#1565c0;">WiFi Plans</h3>
+        <p>High-speed broadband plans for home and office</p>
+        <span class="badge badge-wifi">{{ wifi_plans.count }} plans available</span>
+    </a>
+    <a href="{% url 'plan_list' %}?type=sim" class="plan-card">
+        <div class="plan-icon">&#128241;</div>
+        <h3 style="color:#2e7d32;">SIM Plans</h3>
+        <p>Mobile data, calls and SMS bundles</p>
+        <span class="badge badge-sim">{{ sim_plans.count }} plans available</span>
+    </a>
+    <a href="{% url 'plan_list' %}?type=ott" class="plan-card">
+        <div class="plan-icon">&#127909;</div>
+        <h3 style="color:#880e4f;">OTT Plans</h3>
+        <p>Streaming entertainment at your fingertips</p>
+        <span class="badge badge-ott">{{ ott_plans.count }} plans available</span>
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+        My Active Subscriptions
+        <a href="{% url 'my_subscriptions' %}" class="btn btn-sm btn-outline-primary">View All</a>
+    </div>
+    <div class="card-body">
+        {% if my_subscriptions %}
+        <div class="plan-grid">
+            {% for sub in my_subscriptions %}
+            {% if sub.status == 'active' %}
+            <div class="card" style="margin:0;">
+                <div class="card-body">
+                    <div class="flex-gap" style="margin-bottom:8px;">
+                        <span class="badge badge-{{ sub.plan.plan_type }}">{{ sub.plan.get_plan_type_display }}</span>
+                        <span class="badge badge-active">Active</span>
+                    </div>
+                    <strong>{{ sub.plan.name }}</strong><br>
+                    <span class="text-muted">Rs.{{ sub.plan.price }} / {{ sub.plan.validity_days }} days</span><br>
+                    <span class="text-muted">{{ sub.days_remaining }} days left</span>
+                    <div style="margin-top:8px;">
+                        <a href="{% url 'upgrade_downgrade' sub.pk %}" class="btn btn-sm">Change Plan</a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="text-align:center;color:#888;padding:20px;">No active subscriptions. <a href="{% url 'plan_list' %}">Browse plans</a></p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

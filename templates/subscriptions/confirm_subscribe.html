@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Confirm Subscription{% endblock %}
+{% block content %}
+<div class="card" style="max-width:450px;">
+    <div class="card-header">Confirm Subscription</div>
+    <div class="card-body">
+        <p>You are about to subscribe to:</p>
+        <table style="margin:12px 0;">
+            <tr><td style="padding:4px 8px 4px 0;color:#777;">Plan</td><td><strong>{{ plan.name }}</strong></td></tr>
+            <tr><td style="padding:4px 8px 4px 0;color:#777;">Type</td><td><span class="badge badge-{{ plan.plan_type }}">{{ plan.get_plan_type_display }}</span></td></tr>
+            <tr><td style="padding:4px 8px 4px 0;color:#777;">Price</td><td><strong>Rs.{{ plan.price }}</strong></td></tr>
+            <tr><td style="padding:4px 8px 4px 0;color:#777;">Validity</td><td>{{ plan.validity_days }} days</td></tr>
+        </table>
+        <form method="post">
+            {% csrf_token %}
+            <div class="flex-gap">
+                <button type="submit" class="btn btn-primary">Yes, Subscribe</button>
+                <a href="{% url 'plan_list' %}" class="btn">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

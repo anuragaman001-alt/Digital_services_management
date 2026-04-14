@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2>Admin Dashboard</h2>
+        <p>Overview of all services</p>
+    </div>
+</div>
+
+<div class="stat-grid">
+    <div class="stat-card">
+        <div class="stat-label">Total Users</div>
+        <div class="stat-value">{{ total_users }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Total Plans</div>
+        <div class="stat-value">{{ total_plans }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Total Subscriptions</div>
+        <div class="stat-value">{{ total_subscriptions }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Active Subscriptions</div>
+        <div class="stat-value" style="color:#2e7d32;">{{ active_subscriptions }}</div>
+    </div>
+</div>
+
+<div class="flex-gap" style="margin-bottom:16px;">
+    <a href="{% url 'admin_user_create' %}" class="btn btn-primary">+ Add New User</a>
+    <a href="{% url 'admin_plan_create' %}" class="btn btn-success">+ Add New Plan</a>
+</div>
+
+<div class="card">
+    <div class="card-header">Recent Subscriptions</div>
+    <div class="card-body" style="padding:0;">
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Plan</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sub in recent_subscriptions %}
+                    <tr>
+                        <td>
+                            <strong>{{ sub.user.get_full_name|default:sub.user.username }}</strong><br>
+                            <span class="text-muted">{{ sub.user.email }}</span>
+                        </td>
+                        <td>{{ sub.plan.name }}</td>
+                        <td><span class="badge badge-{{ sub.plan.plan_type }}">{{ sub.plan.get_plan_type_display }}</span></td>
+                        <td>
+                            {% if sub.status == 'active' %}
+                                <span class="badge badge-active">Active</span>
+                            {% else %}
+                                <span class="badge badge-inactive">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-muted">{{ sub.created_at|date:"d M Y" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" style="text-align:center;padding:20px;color:#888;">No subscriptions yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

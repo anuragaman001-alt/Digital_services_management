@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Plans{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2>Browse Plans</h2>
+        <p>Choose a plan that suits you</p>
+    </div>
+</div>
+
+<div class="flex-gap" style="margin-bottom:16px;">
+    <a href="?type=wifi" class="btn {% if plan_type == 'wifi' %}btn-primary{% endif %}">&#128225; WiFi ({{ wifi_count }})</a>
+    <a href="?type=sim"  class="btn {% if plan_type == 'sim'  %}btn-success{% endif %}">&#128241; SIM ({{ sim_count }})</a>
+    <a href="?type=ott"  class="btn {% if plan_type == 'ott'  %}btn-warning{% endif %}">&#127909; OTT ({{ ott_count }})</a>
+</div>
+
+<div class="plan-grid">
+    {% for plan in plans %}
+    <div class="card" style="margin:0;">
+        <div class="card-body">
+            <div style="margin-bottom:8px;">
+                <span class="badge badge-{{ plan.plan_type }}">{{ plan.get_plan_type_display }}</span>
+            </div>
+            <strong style="font-size:15px;">{{ plan.name }}</strong><br>
+            <span style="color:#1565c0;font-weight:bold;font-size:18px;">Rs.{{ plan.price }}</span><br>
+            <span class="text-muted">{{ plan.validity_days }} days</span>
+            {% if plan.description %}<p style="font-size:12px;color:#666;margin:8px 0;">{{ plan.description }}</p>{% endif %}
+            <div class="flex-gap" style="margin-top:12px;">
+                <a href="{% url 'plan_detail' plan.pk %}" class="btn btn-sm btn-outline-primary">View Details</a>
+                <a href="{% url 'subscribe' plan.pk %}" class="btn btn-sm btn-primary">Subscribe</a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <p style="color:#888;grid-column:1/-1;">No plans available for this category.</p>
+    {% endfor %}
+</div>
+{% endblock %}

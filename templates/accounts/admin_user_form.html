@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}{{ action }} User{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2>{{ action }} User</h2>
+        {% if edit_user %}<p>Editing: {{ edit_user.username }}</p>{% endif %}
+    </div>
+    <a href="{% url 'admin_user_list' %}" class="btn btn-sm">&larr; Back</a>
+</div>
+
+<div class="card" style="max-width:650px;">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-row">
+                {% for field in form %}
+                <div class="form-group {% if field.name in 'address' %}col-full{% endif %}">
+                    <label>{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}<div class="error-text">{{ field.errors.0 }}</div>{% endif %}
+                    {% if field.help_text %}<div class="help-text">{{ field.help_text }}</div>{% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            <div class="flex-gap mt-10">
+                <button type="submit" class="btn btn-primary">{{ action }} User</button>
+                <a href="{% url 'admin_user_list' %}" class="btn">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+<style>
+.col-full { grid-column: 1 / -1; }
+</style>
+{% endblock %}
